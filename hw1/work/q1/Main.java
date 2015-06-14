@@ -50,7 +50,7 @@ public class Main {
         long startTime = System.currentTimeMillis();
         for(int i=0; i<numThread; i++) {
             int portion = numTotalInc/numThread;
-            CounterThread temp = new CounterThread((LockCounter)counter, portion, i);
+            CounterThread temp = new CounterThread((Counter)counter, portion, i);
             temp.start();
             threads.add(temp);
         }
