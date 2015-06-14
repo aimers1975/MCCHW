@@ -15,7 +15,7 @@ public class LockCounter extends Counter {
     @Override
     public void increment() {
     	count++;
-        //debug("Count is now: " + count);
+        debug("Count is now: " + count);
     }
 
     private void debug(String msg) {
