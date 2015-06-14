@@ -2,7 +2,6 @@ import java.util.*;
 
 public class Main {
 
-        boolean debug = true;
         
     public static void main (String[] args) {
         Counter counter = null;
@@ -23,6 +22,9 @@ public class Main {
             System.exit(-1);
         }
 
+        numThread = Integer.parseInt(args[1]);
+        numTotalInc = Integer.parseInt(args[2]);
+
         if (args[0].equals("fast")) {
             lock = new FastMutexLock(numThread);
             counter = new LockCounter(lock);
@@ -38,8 +40,7 @@ public class Main {
             System.exit(-1);
         }
 
-        numThread = Integer.parseInt(args[1]);
-        numTotalInc = Integer.parseInt(args[2]);
+
 
         // TODO
         // Please create numThread threads to increment the counter
@@ -71,13 +72,9 @@ public class Main {
               + "of total increment");
         } else {
           // print total execute time if the result is correct
+          //System.out.println("Time to execute: ");
           System.out.println(executeTimeMS);
         }
     }
 
-    private void debug(String msg) {
-        if(debug) {
-            System.out.println(this.getClass().getSimpleName() + ": " + msg);
-        }
-    }
 }

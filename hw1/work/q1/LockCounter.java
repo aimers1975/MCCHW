@@ -5,20 +5,17 @@
 public class LockCounter extends Counter {
 
 	MyLock counterlock;
-	int threadId;
 	boolean debug = true;
 
     public LockCounter(MyLock lock) {
     	this.counterlock = lock;
+        count = 0;
     }
 
     @Override
     public void increment() {
-    	debug("Trying to lock" + threadId);
-    	counterlock.lock(threadId);
     	count++;
-    	debug("Trying to unlock" + threadId);
-    	counterlock.unlock(threadId);
+        //debug("Count is now: " + count);
     }
 
     private void debug(String msg) {

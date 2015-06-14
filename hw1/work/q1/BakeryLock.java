@@ -10,6 +10,7 @@ public class BakeryLock implements MyLock {
 
     public BakeryLock(int numThread) {
     	processes = numThread;
+        //debug("Number of processes is: " + numThread);
     	choosing = new boolean[processes];
     	number = new int[processes];
     	for(int i=0; i<processes; i++) {
@@ -20,6 +21,9 @@ public class BakeryLock implements MyLock {
 
     @Override
     public void lock(int myId) {
+        if(myId >= choosing.length) {
+            //debug("Trying to access choosing w/ID " + myId);
+        }
     	choosing[myId] = true;
     	for(int j=0; j<processes; j++) {
     		if(number[j] > number[myId]) {
