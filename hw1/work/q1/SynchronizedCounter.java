@@ -1,3 +1,4 @@
+import java.util.*;
 // TODO 
 // Use synchronized to protect count
 public class SynchronizedCounter extends Counter {

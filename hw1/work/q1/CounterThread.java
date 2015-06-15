@@ -16,14 +16,14 @@ public class CounterThread extends Thread {
 		for (int i=0; i<increments; i++) {
 			try {
 				((MyLock)((LockCounter)counter).counterlock).lock(threadId);
-			} catch (Exception e) { //debug("No lock, must be synchronized or re-entrant.");}
+			} catch (Exception e) { /*debug("No lock, must be synchronized or re-entrant.");*/}
 			//debug("Thread: " + threadId + " has the lock.");
 			//debug("Thread " + threadId + " incrementing " + i + "count");
 			counter.increment();
 			//debug("Thread: " + threadId + " releasing the lock.");
 			try {
 				((MyLock)((LockCounter)counter).counterlock).unlock(threadId);
-			} catch (Exception e) { //debug("No lock, must be synchronized or re-entrant.");}
+			} catch (Exception e) { /*debug("No lock, must be synchronized or re-entrant.");*/}
 		}
 	}
 

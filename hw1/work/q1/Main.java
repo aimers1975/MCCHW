@@ -75,8 +75,8 @@ public class Main {
         } else {
           // print total execute time if the result is correct
           //System.out.println("Time to execute: ");
-          System.out.println("Count: " + counter.getCount());
-          System.out.println("Count should be: " + ((numTotalInc/numThread)*numThread));
+          //System.out.println("Count: " + counter.getCount());
+          //System.out.println("Count should be: " + ((numTotalInc/numThread)*numThread));
           System.out.println(executeTimeMS);
         }
     }
