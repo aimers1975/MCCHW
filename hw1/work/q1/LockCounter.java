@@ -14,7 +14,10 @@ public class LockCounter extends Counter {
 
     @Override
     public void increment() {
+        int id = ((CounterThread)Thread.currentThread()).getThreadId();
+        counterlock.lock(id);
     	count++;
+        counterlock.unlock(id);
         //debug("Count is now: " + count);
     }
 
