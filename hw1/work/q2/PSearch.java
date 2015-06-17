@@ -1,3 +1,7 @@
+//Amy Reed - UTEID alr2434, email: amy_hindman@yahoo.com
+//David Rosales - UTEID, email: drosales007@gmail.com
+//HW1 Question #2
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.*;
 import java.util.*;
@@ -73,8 +77,8 @@ public class PSearch implements Callable<Integer> {
   }
 
   public static void main (String[] args){
-    int x = 22;
-    int numThreads = 30;
+    int x = 2;
+    int numThreads = 5;
     int[] arr = {0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9};
     int myResult = parallelSearch(x, arr, numThreads);
     if (arr.length <= 0) {
@@ -82,7 +86,7 @@ public class PSearch implements Callable<Integer> {
       System.exit(0);
     }
     if (numThreads > arr.length) {
-      System.out.println("The number of threads is less than the number of items in the array");
+      System.out.println("The number of threads is greater than the number of items in the array");
       System.exit(0);
     }
     if (myResult == -1) {
