@@ -4,16 +4,23 @@
 
 // TODO 
 // Implement Fast Mutex Algorithm
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FastMutexLock implements MyLock {
 
-    int x,y = -1;
+    AtomicInteger x;
+    AtomicInteger y;
     boolean[] flagup;
     int processes;
     boolean debug = true;
     public FastMutexLock(int numThread) {
       // TODO: initialize your algorithm
+      x = new AtomicInteger(-1);
+      y = new AtomicInteger(-1);
       flagup = new boolean[numThread];
+      for (int i=0;i<flagup.length;i++) {
+        flagup[i] = false;
+      }
       processes = numThread;
     }
 
@@ -22,23 +29,23 @@ public class FastMutexLock implements MyLock {
       // TODO: the locking algorithm
         while(true) {
             flagup[myId] = true;
-            x = myId;
+            x.set(myId);
             
-            if(y != -1) {
+            if(y.get() != -1) {
                 flagup[myId] = false;
-                while(y != -1) { wait(myId);}
+                while(y.get() != -1) { wait(myId);}
                 continue;
             } else {
-                y = myId;
-                if(x == myId) {
+                y.set(myId);
+                if(x.get() == myId) {
                     return;
                 } else {
                     flagup[myId] = false;
                     for(int j = 0; j<processes; j++) {
                         while(flagup[j] == true) { wait(myId); }
-                        if(y == myId) return;
+                        if(y.get() == myId) return;
                         else {
-                            while(y != -1) { wait(myId); }
+                            while(y.get() != -1) { wait(myId); }
                             continue;
                         }
                     }
@@ -50,7 +57,8 @@ public class FastMutexLock implements MyLock {
     @Override
     public void unlock(int myId) {
       // TODO: the unlocking algorithm
-        y = -1;
+        y.set(-1);
+        x.set(-1);
         flagup[myId] = false;
     }
 
