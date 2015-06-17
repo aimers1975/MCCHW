@@ -1,3 +1,6 @@
+//Amy Reed - UTEID alr2434, email: amy_hindman@yahoo.com
+//David Rosales - UTEID, email: drosales007@gmail.com
+//HW1 Question #2
 // TODO
 // Use MyLock to protect the count
 // This counter can use either BakeryLock or FastMutexLock to protect the count

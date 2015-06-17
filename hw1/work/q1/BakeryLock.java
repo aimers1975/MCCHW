@@ -1,10 +1,16 @@
+//Amy Reed - UTEID alr2434, email: amy_hindman@yahoo.com
+//David Rosales - UTEID, email: drosales007@gmail.com
+//HW1 Question #2
+
 // TODO
 // Implement the bakery algorithm
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class BakeryLock implements MyLock {
 
 	int processes;
-	int[] number;
+    AtomicIntegerArray number;
+	//int[] number;
 	boolean[] choosing;
     boolean debug = true;
 
@@ -12,10 +18,11 @@ public class BakeryLock implements MyLock {
     	processes = numThread;
         //debug("Number of processes is: " + numThread);
     	choosing = new boolean[processes];
-    	number = new int[processes];
+    	//number = new int[processes];
+        number = new AtomicIntegerArray(processes);
     	for(int i=0; i<processes; i++) {
     		choosing[i] = false;
-    		number[i] = 0;
+    		number.set(i,0);
     	}
     }
 
@@ -26,11 +33,11 @@ public class BakeryLock implements MyLock {
         }
     	choosing[myId] = true;
     	for(int j=0; j<processes; j++) {
-    		if(number[j] > number[myId]) {
-    			number[myId] = number[j];
+    		if(number.get(j) > number.get(myId)) {
+    			number.set(myId,number.get(j));
     		}
     	}
-    	number[myId]++;
+    	number.set(myId, (number.get(myId)+1));
     	choosing[myId] = false;
      	for(int j=0; j<processes; j++) {
     		while(choosing[j]) {
@@ -42,9 +49,9 @@ public class BakeryLock implements MyLock {
                 }
     		}
 
-    		while((number[j] != 0) && 
-    			((number[j] < number[myId]) || 
-    			((number[j] == number[myId]) && j < myId))) {
+    		while((number.get(j) != 0) && 
+    			((number.get(j) < number.get(myId)) || 
+    			((number.get(j) == number.get(myId)) && j < myId))) {
     			try {
     				Thread.sleep(5);
     			}catch(Exception e) { 
@@ -57,7 +64,7 @@ public class BakeryLock implements MyLock {
 
     @Override
     public void unlock(int myId) {
-    	number[myId] = 0;
+    	number.set(myId, 0);
     }
 
     private void debug(String msg) {
