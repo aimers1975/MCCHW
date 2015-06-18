@@ -5,21 +5,25 @@
 // TODO 
 // Implement Fast Mutex Algorithm
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class FastMutexLock implements MyLock {
 
     AtomicInteger x;
     AtomicInteger y;
-    boolean[] flagup;
+    //boolean[] flagup;
+    AtomicIntegerArray flagup;
     int processes;
     boolean debug = true;
     public FastMutexLock(int numThread) {
       // TODO: initialize your algorithm
       x = new AtomicInteger(-1);
       y = new AtomicInteger(-1);
-      flagup = new boolean[numThread];
-      for (int i=0;i<flagup.length;i++) {
-        flagup[i] = false;
+      //flagup = new boolean[numThread];
+      flagup = new AtomicIntegerArray(numThread);
+      for (int i=0;i<flagup.length();i++) {
+        //flagup[i] = false;
+        flagup.set(i,0);
       }
       processes = numThread;
     }
@@ -28,11 +32,11 @@ public class FastMutexLock implements MyLock {
     public void lock(int myId) {
       // TODO: the locking algorithm
         while(true) {
-            flagup[myId] = true;
+            flagup.set(myId,1);
             x.set(myId);
             
             if(y.get() != -1) {
-                flagup[myId] = false;
+                flagup.set(myId,0);
                 while(y.get() != -1) { wait(myId);}
                 continue;
             } else {
@@ -40,9 +44,9 @@ public class FastMutexLock implements MyLock {
                 if(x.get() == myId) {
                     return;
                 } else {
-                    flagup[myId] = false;
+                    flagup.set(myId,0);
                     for(int j = 0; j<processes; j++) {
-                        while(flagup[j] == true) { wait(myId); }
+                        while(flagup.get(j) == 1) { wait(myId); }
                         if(y.get() == myId) return;
                         else {
                             while(y.get() != -1) { wait(myId); }
@@ -59,7 +63,7 @@ public class FastMutexLock implements MyLock {
       // TODO: the unlocking algorithm
         y.set(-1);
         x.set(-1);
-        flagup[myId] = false;
+        flagup.set(myId,0);
     }
 
     public void wait(int myId) {
