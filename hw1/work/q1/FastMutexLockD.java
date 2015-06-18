@@ -1,27 +1,25 @@
 //Amy Reed - UTEID alr2434, email: amy_hindman@yahoo.com
-//David Rosales - UTEID dar542, email: drosales007@gmail.com
+//David Rosales - UTEID, email: drosales007@gmail.com
 //HW1 Question #2
 
 // TODO 
 // Implement Fast Mutex Algorithm
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class FastMutexLock implements MyLock {
 
     AtomicInteger x;
     AtomicInteger y;
-    //boolean[] flagup;
-    AtomicIntegerArray flagup;
+    boolean[] flagup;
     int processes;
     boolean debug = true;
     public FastMutexLock(int numThread) {
       // TODO: initialize your algorithm
       x = new AtomicInteger(-1);
       y = new AtomicInteger(-1);
-      flagup = new AtomicIntegerArray(numThread);
-      for (int i=0;i<flagup.length();i++) {
-        flagup.set(i,0);
+      flagup = new boolean[numThread];
+      for (int i=0;i<flagup.length;i++) {
+        flagup[i] = false;
       }
       processes = numThread;
     }
@@ -30,11 +28,11 @@ public class FastMutexLock implements MyLock {
     public void lock(int myId) {
       // TODO: the locking algorithm
         while(true) {
-            flagup.set(myId,1);
+            flagup[myId] = true;
             x.set(myId);
             
             if(y.get() != -1) {
-                flagup.set(myId,0);
+                flagup[myId] = false;
                 while(y.get() != -1) { wait(myId);}
                 continue;
             } else {
@@ -42,9 +40,15 @@ public class FastMutexLock implements MyLock {
                 if(x.get() == myId) {
                     return;
                 } else {
-                    flagup.set(myId,0);
-                    for(int j = 0; j<processes; j++) {
-                        while(flagup.get(j) == 1) { wait(myId); }
+                    flagup[myId] = false;
+                    boolean x = true;
+                    while (x){
+                        for(int j = 0; j<processes; j++) {
+                            if(flagup[j] == true) {
+                                wait(myId);
+                            }
+                        }
+                        x = false;
                     }
                     if(y.get() == myId) return;
                     else {
@@ -61,7 +65,7 @@ public class FastMutexLock implements MyLock {
       // TODO: the unlocking algorithm
         y.set(-1);
         x.set(-1);
-        flagup.set(myId,0);
+        flagup[myId] = false;
     }
 
     public void wait(int myId) {
@@ -78,5 +82,13 @@ public class FastMutexLock implements MyLock {
             System.out.println(this.getClass().getSimpleName() + ": " + msg);
         }
     }
-}
 
+    public boolean free(){
+        for (int i=0; i<processes; i++){
+            if (flagup[i] == true){
+                return false;
+            }
+        }
+        return true;
+    }
+}
