@@ -7,7 +7,6 @@ public class CyclicBarrier {
 
   Semaphore barrier;
   int processes;
-  boolean releasing;
   boolean everyoneMadeIt;
 
 
@@ -17,7 +16,6 @@ public class CyclicBarrier {
     // TODO: The constructor for this CyclicBarrier
     this.processes = parties;
     this.barrier = new Semaphore(processes);
-    releasing = false;
   }
 
   public int await() throws InterruptedException {
@@ -28,8 +26,8 @@ public class CyclicBarrier {
     // Returns: the arrival index of the current thread, where index
     // (parties - 1) indicates the first to arrive and zero indicates
     // the last to arrive.
-    while(releasing) { 
-        //System.out.println("Checking all permits are released before acquiring.");
+    while(everyoneMadeIt) { 
+        //System.out.println("Checking all permits are released from last round before acquiring.");
         Thread.sleep(5);
     }
     barrier.acquire();
@@ -42,14 +40,12 @@ public class CyclicBarrier {
     while(everyoneMadeIt == false) {
         Thread.sleep(5);
     }
-    releasing = true;
     barrier.release();
     int temppermits = barrier.availablePermits();
     //System.out.println("Thread " + arrivalIndex + " release permit. " + temppermits + " are left to release."); 
     if(temppermits == processes) {
         //System.out.println("All permits released.");
         everyoneMadeIt = false;
-        releasing = false;
     }
     return arrivalIndex;
   }
