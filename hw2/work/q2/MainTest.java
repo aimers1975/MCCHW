@@ -1,8 +1,19 @@
 public class MainTest {
 
 	public static void main(String[] args) {
-		//ArrayList<Person> line = new ArrayList<Person>();
-		SyncBathroomProtocol protocol = new SyncBathroomProtocol();
+
+		BathroomProtocol protocol = null;
+		if(args.length == 0) {
+			System.out.println("Enter \"lock\" or \"sync\"");
+			System.exit(0);
+		}
+		if(args[0].equals("lock")) {
+			protocol = new LockBathroomProtocol();
+
+		} else if(args[0].equals("sync")) {
+			protocol = new SyncBathroomProtocol();
+		} 
+		
 		Person firstmale = new Person(false,protocol, 5000);
 		Person thmale = new Person(false,protocol, 7000);
 		Person firstfemale = new Person(true,protocol, 10000);
@@ -81,7 +92,11 @@ public class MainTest {
 			long end = System.currentTimeMillis();
 			start = end - start;
 			System.out.println("The time for this protocol was: " + start);
-			System.out.println( "Total entered: " + protocol.getTotalEntered() + " Total Exited: " + protocol.getTotalExited());
+			if(args[0].equals("lock")) {
+				System.out.println("Total entered: " + ((LockBathroomProtocol)protocol).getTotalEntered() + " Total exited: " + ((LockBathroomProtocol)protocol).getTotalEntered());
+			} else if(args[0].equals("sync")) {
+				System.out.println("Total entered: " + ((SyncBathroomProtocol)protocol).getTotalEntered() + " Total exited: " + ((SyncBathroomProtocol)protocol).getTotalEntered());
+			}			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

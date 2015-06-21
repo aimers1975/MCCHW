@@ -1,12 +1,13 @@
 public class Person extends Thread {
 
 	boolean female;
-	SyncBathroomProtocol prot;
+	//SyncBathroomProtocol prot;
+	BathroomProtocol prot;
 	int timeInBath;
 
-	public Person(boolean fem, SyncBathroomProtocol bathProt, int myTimeInBath) {
+	public Person(boolean fem, BathroomProtocol lockProt, int myTimeInBath) {
 		this.female = fem;
-		this.prot = bathProt;
+		this.prot = lockProt;
 		this.timeInBath = myTimeInBath; 
 
 	}

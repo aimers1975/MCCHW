@@ -28,6 +28,7 @@ public class SyncBathroomProtocol implements BathroomProtocol {
   public int getTotalExited() {
     return overallExited;
   }
+  
   public void enterMale() {
       closeDoor(false);
 
