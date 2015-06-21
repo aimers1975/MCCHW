@@ -24,11 +24,30 @@ public class SomethingThread extends Thread {
 				e.printStackTrace();
 			}
 			myCount++;
+			System.out.println("Thread " + myId + " count is now " + myCount);
 			if(myCount == barrierNum) {
-				System.out.println("Thread ID: " + myId + " is waiting for the rest of the threads at count: " + myCount);
+				//System.out.println("Thread ID: " + myId + " is waiting for the rest of the threads at count: " + myCount);
 				try {
 					int myPlace = wait.await();
-					System.out.println("Thread " + myId + " was number " + myPlace);
+					//System.out.println("Thread " + myId + " was number " + myPlace + " for count to 25");
+				} catch(InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			if(myCount == (barrierNum+10)) {
+				//System.out.println("Thread ID: " + myId + " is now waiting for threads at count (shows reuse of barrier): " + myCount);
+				try {
+					int myPlace = wait.await();
+					//System.out.println("Thread " + myId + " was number " + myPlace + " for count to 35.");
+				} catch(InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			if(myCount == (barrierNum+20)) {
+				//System.out.println("Thread ID: " + myId + " is now waiting for threads at count (shows reuse of barrier): " + myCount);
+				try {
+					int myPlace = wait.await();
+					//System.out.println("Thread " + myId + " was number " + myPlace + " for count to 35.");
 				} catch(InterruptedException e) {
 					e.printStackTrace();
 				}
