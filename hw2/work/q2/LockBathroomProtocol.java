@@ -33,25 +33,30 @@ public class LockBathroomProtocol implements BathroomProtocol {
   	}
 
 	public void enterMale() {
-		System.out.println("Male try.   Female count: " + femaleCount + " Female wait: " + femaleWait + " Male count: " + maleCount + " Male wait: " + maleWait);
+		
 		bathroomLock.lock();
+		System.out.println("Male try.         Female count: " + femaleCount + " Male count: " + maleCount + " Female wait: " + femaleWait + " Male wait: " + maleWait);
 		boolean setWait = false;
 	   	try {
-	   		while (femaleWait > 0 || femaleCount > 0) {
-	   			while (femaleWait > 0) { noWait.await();}
+	   		while (femaleWait > 0 ) { noWait.await();}
+	   		while (femaleCount > 0) { 
 	   			if(!setWait) { 
 	   				maleWait++;
 	   				setWait=true;
-	   				System.out.println("Male waiting.   Female count: " + femaleCount + " Female wait: " + femaleWait + " Male count: " + maleCount + " Male wait: " + maleWait);
+	   				System.out.println("Male waiting.     Female count: " + femaleCount + " Male count: " + maleCount + " Female wait: " + femaleWait + " Male wait: " + maleWait);
 	   			}
 	   			doorOpen.await();
 	       	}
 	       	maleCount++;
-	       	System.out.println("Male entered.     Female count: " + femaleCount + " Female wait: " + femaleWait + " Male count: " + maleCount + " Male wait: " + maleWait);
+	       	System.out.println("Male entered.     Female count: " + femaleCount + " Male count: " + maleCount + " Female wait: " + femaleWait + " Male wait: " + maleWait);
 	       	overallEntered++;
+	       	doorOpen.signal();
 	       	if(setWait) { 
 	       		maleWait--;
-	       		if(maleWait == 0) {noWait.signal();}
+	       		if(maleWait == 0) {
+	       			noWait.signal();
+	       			
+	       		}
 	       	}
 	       		   
 		       
@@ -68,33 +73,37 @@ public class LockBathroomProtocol implements BathroomProtocol {
 	  	  bathroomLock.lock();
 	  	  maleCount--;
 	  	  overallExited++;
+	  	  System.out.println("Male exited.      Female count: " + femaleCount + " Male count: " + maleCount + " Female wait: " + femaleWait + " Male wait: " + maleWait);
 	  	  doorOpen.signal();
 	  	  noWait.signal();
 	  	  bathroomLock.unlock();
-	  	  System.out.println("Male exited.   Female count: " + femaleCount + " Female wait: " + femaleWait + " Male count: " + maleCount + " Male wait: " + maleWait);
+	  	  
 
 	  }
 
 	  public void enterFemale() {
-	  	System.out.println("Female try.   Female count: " + femaleCount + " Female wait: " + femaleWait + " Male count: " + maleCount + " Male wait: " + maleWait);
+	  	System.out.println("Female try.       Female count: " + femaleCount + " Male count: " + maleCount + " Female wait: " + femaleWait + " Male wait: " + maleWait);
 		bathroomLock.lock();
 		boolean setWait = false;
 	   	try {
-	   		while (maleWait > 0 || maleCount > 0) {
-	   			while (maleWait > 0) { noWait.await();}
+	   		while (maleWait > 0 ) { noWait.await();}
+	   		while (maleCount > 0) { 
 	   			if(!setWait) { 
 	   				femaleWait++;
 	   				setWait=true;
-	   				System.out.println("Female waiting.   Female count: " + femaleCount + " Female wait: " + femaleWait + " Male count: " + maleCount + " Male wait: " + maleWait);
+	   				System.out.println("Female waiting.   Female count: " + femaleCount + " Male count: " + maleCount + " Female wait: " + femaleWait + " Male wait: " + maleWait);
 	   			}
 	   			doorOpen.await();
 	       	}
 	       	femaleCount++;
-	       	System.out.println("Female entered.   Female count: " + femaleCount + " Female wait: " + femaleWait + " Male count: " + maleCount + " Male wait: " + maleWait);
+	       	System.out.println("Female entered.   Female count: " + femaleCount + " Male count: " + maleCount + " Female wait: " + femaleWait + " Male wait: " + maleWait);
 	       	overallEntered++;
+	       	doorOpen.signal();
 	       	if(setWait) { 
 	       		femaleWait--;
-	       		if(femaleWait == 0) {noWait.signal();}
+	       		if(femaleWait == 0) {
+	       			noWait.signal();
+	       		}
 	       	}
 	       		   
 		} catch(InterruptedException e) {
@@ -108,11 +117,12 @@ public class LockBathroomProtocol implements BathroomProtocol {
 	  public void leaveFemale() {
 	  	  bathroomLock.lock();
 	  	  femaleCount--;
+	  	  System.out.println("Female exited.    Female count: " + femaleCount + " Male count: " + maleCount + " Female wait: " + femaleWait + " Male wait: " + maleWait);
 	  	  overallExited++;
 	  	  doorOpen.signal();
 	  	  noWait.signal();
 	  	  bathroomLock.unlock();
-	  	  System.out.println("Female exited.   Female count: " + femaleCount + " Female wait: " + femaleWait + " Male count: " + maleCount + " Male wait: " + maleWait);
+	  	  
 	  }
 
 
