@@ -6,11 +6,11 @@ import java.util.*;
 
 public class MainTest {
   public static void main(String[] args) {
-      int processes = 0;
+      int processes = 10;
       ArrayList<Thread> myThreads = new ArrayList<Thread>();
       try {
           processes = Integer.parseInt(args[0]);
-      } catch (NumberFormatException e) {
+      } catch (Exception e) {
            e.printStackTrace();
       }
       if(processes > 0) {
