@@ -4,6 +4,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <ctime>
+#include <chrono>
 using namespace std;
 
 // Want to reuse code to init matrix
@@ -36,33 +38,59 @@ bool MatrixMult(int rowA, int colA, double** A, int rowB, int colB, double** B,
 	// parameter T: indicates the number of threads
 	// return true if A and B can be multiplied; otherwise, return false 
 	if (rowA != colB) {
-		cout << "The matix cannot be mult. \nRow A = " << rowA << " and Col B = " << colB << "\n";
-		cin.get();
+		//cout << "The matix cannot be mult. \nRow A = " << rowA << " and Col B = " << colB << "\n";
+		//cin.get();
 		return false;
 	}
 	else {
-		cout << "The matix can be mult. \nRow A = " << rowA << " and Col B = " << colB << " \n";
+		//cout << "The matix can be mult. \nRow A = " << rowA << " and Col B = " << colB << " \n";
 
-		omp_set_num_threads(T);  
+		omp_set_num_threads(T);
+		double parts = 100 / T;
+		int chunk = parts;
 
 		double temp = 0.0;
-		#pragma omp parallel for reduction (+:temp)
-		for (int row = 0; row < rowA; row++) { 
-			for (int col = 0; col < colB; col++) {
+		unsigned long long Int64 = 0;
+		int tid, nthreads,row,col,inner;
+		unsigned long start =
+			chrono::duration_cast<std::chrono::milliseconds>
+			(chrono::system_clock::now().time_since_epoch()).count();
+		bool done = false;
+		ofstream fout("C:\\MCCHW\\hw3\\result.txt");
+
+
+		//#pragma omp parallel 
+		//{
+		#pragma omp parallel for \
+		shared(A,B,C,chunk) private(tid,row,col,inner) \
+		schedule(static,chunk) \
+		reduction(+:temp)
+		for (row = 0; row < rowA; row++) {
+			for (col = 0; col < colB; col++) {
 				// Multiply the row of A by the column of B to get the row, column of product.
 				temp = 0.0;
-				for (int inner = 0; inner < colA; inner++) {
+				for (inner = 0; inner < colA; inner++) {
 					//int ID = omp_get_thread_num();
 					//cout << "The thread id: " << ID << "\n";
 					//cout << "Multiplying: " << "A[" << row << "][" << inner << "]" << " by " << "B[" << inner << "][" << col << "] toget C[" << row << "][" << col << "]" "\n";
-					temp += A[row][inner] * B[inner][col];
+					 temp+= A[row][inner] * B[inner][col];
 				}
 				C[row][col] = temp;
-				cout << C[row][col] << "  ";
+
+				
+				//cout << C[row][col] << "  ";
 			}
-			cout << "\n";
+			//cout << "\n";
 		}
-		cin.get();
+		//}
+		//cin.get();
+		unsigned long end =
+			chrono::duration_cast<std::chrono::milliseconds>
+			(chrono::system_clock::now().time_since_epoch()).count();
+		unsigned long timered = end - start;
+		fout << "The time is: " << timered << "\n";
+		fout << flush;
+		fout.close();
 		return true;
 	}
 }
@@ -83,10 +111,10 @@ int main(int argc, const char *argv[]) {
 	}
 
 	ifstream inf(argv[1]);
-	cout << "The first file is: " << argv[1] << "\n";
+	//cout << "The first file is: " << argv[1] << "\n";
 	ifstream inf2(argv[2]);
-	cout << "The second file is: " << argv[2] << "\n";
-	cout << "The threads are: " << argv[3] << "\n";
+	//cout << "The second file is: " << argv[2] << "\n";
+	//cout << "The threads are: " << argv[3] << "\n";
 	stringstream str; 
 	str << argv[3];
 	str >> T;
@@ -116,10 +144,23 @@ int main(int argc, const char *argv[]) {
 
 	// TODO: Initialize the necessary data
 	if (MatrixMult(ROWA, COLA, A, ROWB, COLB, B, C, T)) {
+		ofstream fout("C:\\MCCHW\\hw3\\result.txt", std::ios::app);
+		for (int row = 0; row < ROWA; row++) {
+			for (int col = 0; col < COLB; col++) {
+				cout << C[row][col] << " ";
+				fout << C[row][col] << " ";
+			}
+			cout << "\n";
+			fout << "\n";
+		}
+		fout << flush;
+		fout.close();
 		cout << "The matrix can be multiplied" << endl;
+		cin.get();
 	}
 	else {
 		cout << "the colA != rowB MatrixMult return false" << endl;
+		cin.get();
 	}
 	return 0;
 }
