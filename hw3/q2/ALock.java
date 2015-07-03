@@ -3,34 +3,32 @@ import java.util.concurrent.atomic.AtomicInteger;
 // Implement Anderson’s array-based lock
 
 public class ALock implements MyLock {
-    ThreadLocal<Integer> mySlotIndex = new ThreadLocal<Integer>(){
-          protected Integer initialValue() {
-               return 0;
-          }
+    ThreadLocal<Integer> mySlot = new ThreadLocal<Integer>(){
+          protected Integer initialValue() { return 0;}
      };
-     AtomicInteger tail;
-     boolean[] flag;
+     AtomicInteger tailSlot;
+     boolean[] available;
      int size;
     public ALock(int numThread) {
       // TODO: initialize your algorithm
       size = numThread;
-      tail = new AtomicInteger(0);
-      flag = new boolean[size];
-      flag[0] = true;
+      tailSlot = new AtomicInteger(0);
+      available = new boolean[size];
+      available[0] = true;
     }
 
     @Override
     public void lock(int myId) {
-          int slot = tail.getAndIncrement() % size;
-          mySlotIndex.set(slot);
-          while (! flag[slot]) {};
+          int slot = tailSlot.getAndIncrement() % size;
+          mySlot.set(slot);
+          while (!available[slot]) {};
     }
 
     @Override
     public void unlock(int myId) {
-          int slot = mySlotIndex.get();
-          flag[slot] = false;
-          flag[(slot + 1) % size] = true;      // TODO: the unlocking algorithm
+          int slot = mySlot.get();
+          available[slot] = false;
+          available[(slot + 1) % size] = true;      
     }
 }
 
