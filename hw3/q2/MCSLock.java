@@ -7,7 +7,7 @@ public class MCSLock implements MyLock {
 	//(ThreadLocal) myNode;
 	//(ThreadLocal) predessor;
 
-	Public class Node {
+	public class Node {
 		boolean Locked = false;
 		Node next = null;
 	}
@@ -22,7 +22,6 @@ public class MCSLock implements MyLock {
 	//	myNode.locked = true;
 	//	pred.next = myNode;
 	//	while(myNode locked) { wait();}  // wait on local memory vs shared
-}
 
     }
 
