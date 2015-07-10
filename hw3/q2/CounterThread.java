@@ -16,7 +16,7 @@ public class CounterThread extends Thread {
 	}
 
 	public void run() {
-		debug("Thread " + threadId + "has " + increments + " counts");
+		//debug("Thread " + threadId + " has " + increments + " counts");
 		for (int i=0; i<increments; i++) {
 			counter.increment();
 		}

@@ -59,8 +59,6 @@ bool MatrixMult(int rowA, int colA, double** A, int rowB, int colB, double** B,
 		ofstream fout("C:\\MCCHW\\hw3\\result.txt");
 
 
-		//#pragma omp parallel 
-		//{
 		#pragma omp parallel for \
 		shared(A,B,C,chunk) private(tid,row,col,inner) \
 		schedule(static,chunk) \
@@ -82,7 +80,7 @@ bool MatrixMult(int rowA, int colA, double** A, int rowB, int colB, double** B,
 			}
 			//cout << "\n";
 		}
-		//}
+
 		//cin.get();
 		unsigned long end =
 			chrono::duration_cast<std::chrono::milliseconds>

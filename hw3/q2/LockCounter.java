@@ -21,6 +21,7 @@ public class LockCounter extends Counter {
         int id = ((CounterThread)Thread.currentThread()).getThreadId();
         counterlock.lock(id);
     	count++;
+        //System.out.println("Thread: " + id + " is incrementing. Count is now: " + count);
         counterlock.unlock(id);
         //debug("Count is now: " + count);
     }
