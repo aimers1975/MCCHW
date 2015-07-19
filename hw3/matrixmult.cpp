@@ -51,7 +51,7 @@ bool MatrixMult(int rowA, int colA, double** A, int rowB, int colB, double** B,
 
 		double temp = 0.0;
 		unsigned long long Int64 = 0;
-		int tid, nthreads,row,col,inner;
+		int tid, nthreads, row, col, inner;
 		unsigned long start =
 			chrono::duration_cast<std::chrono::milliseconds>
 			(chrono::system_clock::now().time_since_epoch()).count();
@@ -59,10 +59,10 @@ bool MatrixMult(int rowA, int colA, double** A, int rowB, int colB, double** B,
 		ofstream fout("C:\\MCCHW\\hw3\\result.txt");
 
 
-		#pragma omp parallel for \
-		shared(A,B,C,chunk) private(tid,row,col,inner) \
-		schedule(static,chunk) \
-		reduction(+:temp)
+#pragma omp parallel for \
+	shared(A, B, C, chunk) private(tid, row, col, inner) \
+	schedule(static, chunk) \
+	reduction(+:temp)
 		for (row = 0; row < rowA; row++) {
 			for (col = 0; col < colB; col++) {
 				// Multiply the row of A by the column of B to get the row, column of product.
@@ -71,11 +71,11 @@ bool MatrixMult(int rowA, int colA, double** A, int rowB, int colB, double** B,
 					//int ID = omp_get_thread_num();
 					//cout << "The thread id: " << ID << "\n";
 					//cout << "Multiplying: " << "A[" << row << "][" << inner << "]" << " by " << "B[" << inner << "][" << col << "] toget C[" << row << "][" << col << "]" "\n";
-					 temp+= A[row][inner] * B[inner][col];
+					temp += A[row][inner] * B[inner][col];
 				}
 				C[row][col] = temp;
 
-				
+
 				//cout << C[row][col] << "  ";
 			}
 			//cout << "\n";
@@ -113,7 +113,7 @@ int main(int argc, const char *argv[]) {
 	ifstream inf2(argv[2]);
 	//cout << "The second file is: " << argv[2] << "\n";
 	//cout << "The threads are: " << argv[3] << "\n";
-	stringstream str; 
+	stringstream str;
 	str << argv[3];
 	str >> T;
 
@@ -142,18 +142,18 @@ int main(int argc, const char *argv[]) {
 
 	// TODO: Initialize the necessary data
 	if (MatrixMult(ROWA, COLA, A, ROWB, COLB, B, C, T)) {
-		ofstream fout("C:\\MCCHW\\hw3\\result.txt", std::ios::app);
+		//ofstream fout("C:\\MCCHW\\hw3\\result.txt", std::ios::app);
 		for (int row = 0; row < ROWA; row++) {
 			for (int col = 0; col < COLB; col++) {
 				cout << C[row][col] << " ";
-				fout << C[row][col] << " ";
+				//fout << C[row][col] << " ";
 			}
 			cout << "\n";
-			fout << "\n";
+			//fout << "\n";
 		}
-		fout << flush;
-		fout.close();
-		cout << "The matrix can be multiplied" << endl;
+		//fout << flush;
+		//fout.close();
+		//cout << "The matrix can be multiplied" << endl;
 		cin.get();
 	}
 	else {
