@@ -3,13 +3,20 @@ import java.util.concurrent.atomic.*;
 
 public class LockFreeQueue<T> implements MyQueue<T> {
   
-  AtomicReference<QNode> head;
-  AtomicReference<QNode> tail;
+  AtomicMarkableReference<QNode> head;
+  AtomicMarkableReference<QNode> tail;
 
   public LockFreeQueue () {
   	  QNode temp = new QNode();
-  	  head = new AtomicReference<QNode>(temp);
-  	  tail = new AtomicReference<QNode>(temp);
+  	  temp.next = null;
+  	  head = new AtomicMarkableReference<QNode>(temp,false);
+  	  tail = head;
+      if(tail == null) {
+        System.out.println("Tail is null");
+      } else {
+        System.out.println("Tail not null");
+      }
+
 
   }
 
@@ -17,35 +24,38 @@ public class LockFreeQueue<T> implements MyQueue<T> {
 
     QNode temp = new QNode();
     temp.value = value;
+    temp.next = null;
     QNode tailNode;
-    QNode nextNode;
-    System.out.println("Got the Integer " + ((Integer)(temp.value)).toString());
+    AtomicReference<QNode> nextNode;
+    boolean[] mark;
     while(true) {
-    	tailNode = tail.get(); //get current tail
-    	nextNode = tailNode.next.get(); //get current tail next, should be null
+    	mark = new boolean[1];
+    	tailNode = tail.get(mark); //get current tail
       if(tailNode == null) {
-          System.out.println("Tailnode is null");
+          System.out.println("tailNode is null");
       }
       if(temp == null) {
           System.out.println("temp is null");
       }
-      if(tailNode.next == null) {
-        System.out.println("tailNode.next is null");
+      if (mark == null) {
+          System.out.println("mark is null");
       }
-    	if(tailNode == tail.get()) { //if we still have the end node
+    	nextNode = tail.getReference().next; //get current tail next, should be null
+    	if(tailNode == tail.getReference()) { //if we still have the end node
     		if (nextNode == null) { // and no one is modify
     			//compareAndSet(V expectedReference, V newReference, boolean expectedMark, boolean newMark)           
-            if(tailNode.next.compareAndSet(nextNode, temp)) {
+            if(tailNode.next.compareAndSet(null, temp)) {
                 System.out.println("Got to break");
                 break;
             } else {
-                tail.compareAndSet(tailNode, nextNode);
+                tail.compareAndSet(tailNode, nextNode.get(), mark[0],!mark[0]);
+              break;
             }
     		}
     	}
     }
-    tail.compareAndSet(tailNode,temp);
-    return true;
+    tail.compareAndSet(tailNode,temp,mark[0],!mark[0]);
+    return false;
   }
 
   public T deq() {
@@ -74,20 +84,22 @@ D18: endloop
 D19: free(head.ptr) // It is safe now to free the old node
 D20: return TRUE // Queue was not empty, dequeue succeeded*/
     while(true) {
-    	QNode headNode = head.get();
-    	QNode tailNode = tail.get();
+    	boolean[] mark = new boolean[1];
+    	boolean[] mark2 = new boolean[1];
+    	QNode headNode = head.get(mark);
+    	QNode tailNode = tail.get(mark2);
     	AtomicReference<QNode> nextNode = headNode.next;
-    	if(headNode == head.get()) {
+    	if(headNode == head.getReference()) {
     	    if(head == tail) {
       		    //Is queue empty or tail falling behind
       		    if(nextNode == null) {
       		    	  return null;
       		    }
-      		    tail.compareAndSet(tailNode,nextNode.get());
+      		    tail.compareAndSet(tailNode,nextNode.get(),mark[0],!mark[0]);
               break;
     	    } else {
       	    	T thisVal = nextNode.get().value;
-              if(head.compareAndSet(headNode,nextNode.get())) { 
+              if(head.compareAndSet(headNode,nextNode.get(),mark[0],!mark[0])) { 
                   return thisVal;              
               }
     	    }
@@ -98,17 +110,19 @@ D20: return TRUE // Queue was not empty, dequeue succeeded*/
 
   public String toString() {
       StringBuilder sb = new StringBuilder();
-      QNode current = head.get().next.get();
-      while((current != null)) {
-          sb.append("Val: " + current.value.toString() + "\n");
-          current = current.next.get();           
+      QNode current = head.getReference();
+      while(current != null) {
+        sb.append("Val: " + current.value + "\n");
+        current = current.next.get();
       }
+
       return sb.toString();
+
   }
 
   public class QNode {
   	T value;
-  	AtomicReference<QNode> next = new AtomicReference<QNode>(null);
+  	AtomicReference<QNode> next = new AtomicReference<QNode>();
   }
 
 }
