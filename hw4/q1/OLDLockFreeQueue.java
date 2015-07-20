@@ -11,13 +11,6 @@ public class LockFreeQueue<T> implements MyQueue<T> {
   	  temp.next = null;
   	  head = new AtomicMarkableReference<QNode>(temp,false);
   	  tail = head;
-      if(tail == null) {
-        System.out.println("Tail is null");
-      } else {
-        System.out.println("Tail not null");
-      }
-
-
   }
 
   public boolean enq(T value) {
@@ -31,21 +24,11 @@ public class LockFreeQueue<T> implements MyQueue<T> {
     while(true) {
     	mark = new boolean[1];
     	tailNode = tail.get(mark); //get current tail
-      if(tailNode == null) {
-          System.out.println("tailNode is null");
-      }
-      if(temp == null) {
-          System.out.println("temp is null");
-      }
-      if (mark == null) {
-          System.out.println("mark is null");
-      }
     	nextNode = tail.getReference().next; //get current tail next, should be null
     	if(tailNode == tail.getReference()) { //if we still have the end node
     		if (nextNode == null) { // and no one is modify
     			//compareAndSet(V expectedReference, V newReference, boolean expectedMark, boolean newMark)           
             if(tailNode.next.compareAndSet(null, temp)) {
-                System.out.println("Got to break");
                 break;
             } else {
                 tail.compareAndSet(tailNode, nextNode.get(), mark[0],!mark[0]);

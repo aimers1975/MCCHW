@@ -18,30 +18,20 @@ public class LockFreeQueue<T> implements MyQueue<T> {
     QNode temp = new QNode();
     temp.value = value;
     QNode tailNode;
-    QNode nextNode;
-    System.out.println("Got the Integer " + ((Integer)(temp.value)).toString());
+    QNode nextNode=null;
+
     while(true) {
     	tailNode = tail.get(); //get current tail
-    	nextNode = tailNode.next.get(); //get current tail next, should be null
-      if(tailNode == null) {
-          System.out.println("Tailnode is null");
-      }
-      if(temp == null) {
-          System.out.println("temp is null");
-      }
-      if(tailNode.next == null) {
-        System.out.println("tailNode.next is null");
-      }
+ 	    nextNode = tailNode.next.get(); //get current tail next, should be null
     	if(tailNode == tail.get()) { //if we still have the end node
-    		if (nextNode == null) { // and no one is modify
-    			//compareAndSet(V expectedReference, V newReference, boolean expectedMark, boolean newMark)           
-            if(tailNode.next.compareAndSet(nextNode, temp)) {
-                System.out.println("Got to break");
-                break;
-            } else {
-                tail.compareAndSet(tailNode, nextNode);
-            }
-    		}
+      		if (nextNode == null) { // and no one is modify
+      			//compareAndSet(V expectedReference, V newReference, boolean expectedMark, boolean newMark)           
+              if(tailNode.next.compareAndSet(nextNode, temp)) {
+                  break;
+              }
+          } else {
+              tail.compareAndSet(tailNode, nextNode);
+      		}
     	}
     }
     tail.compareAndSet(tailNode,temp);
@@ -87,7 +77,8 @@ D20: return TRUE // Queue was not empty, dequeue succeeded*/
               break;
     	    } else {
       	    	T thisVal = nextNode.get().value;
-              if(head.compareAndSet(headNode,nextNode.get())) { 
+              if(head.compareAndSet(headNode,nextNode.get())) {
+                  System.out.println("Dequeuing: " + thisVal); 
                   return thisVal;              
               }
     	    }
