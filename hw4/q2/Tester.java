@@ -1,18 +1,36 @@
-public class Tester {
-	public Tester() {
+public class Tester extends Thread{
+	int id;
+	LockFreeListSet<Integer> listing;
+	int range;
 
+	public Tester(int id, int range, LockFreeListSet<Integer> listing) {
+        this.id = id;
+        this.listing = listing;
+        this.range = range;
+	}
+
+	public void run() {
+		int i;
+		for(i=id; i<range; i++) {
+			System.out.println("Adding: " + i);
+			listing.add(new Integer(i));
+		}
+		if(listing.remove(new Integer(i-2))) {
+		    System.out.println("Removed: " + (i-2));	
+		}
 	}
 
 	public static void main(String[] args) {
   	    LockFreeListSet<Integer> myList = new LockFreeListSet<Integer>();
-  	    myList.add(new Integer(3));
-  	    myList.add(new Integer(5));
-  	    myList.add(new Integer(7));
-  	    System.out.println("My list: \n" + myList.toString());
-  	    if(myList.contains(new Integer(5))) {
-  	    	System.out.println("My list contains 5");
-  	    } else {
-  	    	System.out.println("List missing 5");
-  	    }
+		for(int i=0; i<20; i=i+5) {
+			Tester thisThread = new Tester(i, i+5, myList);
+			thisThread.start();
+		}
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Final queue: \n"  + myList.toString());
     }
 }
