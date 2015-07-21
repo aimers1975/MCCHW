@@ -1,25 +1,32 @@
+import java.util.concurrent.atomic.*;
 
 public class LockFreeListSet<T> implements ListSet<T> {
-  AtomicMarkableReference<LLNode> list = new AtomicMarkableReference<LLNode>();
-  AtomicMarkableReference<LLNode> end = new AtomicMarkableReference<LLNode>();
+  AtomicMarkableReference<LLNode> list;
+  AtomicMarkableReference<LLNode> end;
 
-  public LockFreeListSet<T> () {
+  public LockFreeListSet () {
   	LLNode first = new LLNode();
-  	first.next = null;
-  	list = new AtomicMarkableReference<LLNode>(first);
-  	end = new AtomicMarkableReference<LLNode>(first);
+  	first.next = new AtomicMarkableReference<LLNode>(null,false);
+  	list = new AtomicMarkableReference<LLNode>(first,false);
+  	end = new AtomicMarkableReference<LLNode>(first,false);
   }
 
   public boolean add(T value) {
   	LLNode newNode = new LLNode();
   	newNode.value = value;
+  	LLNode currentEnd;
+  	LLNode currentNext;
+  	boolean[] mark;
+  	boolean[] mark2;
   	while(true) {
-	  	boolean[] mark = new boolean[1];
-	  	LLNode currentEnd = end.get(mark);
-	  	LLNode currentNext = end.getReference.next.get();
+	  	mark = new boolean[1];
+	  	mark2 = new boolean[1];
+	  	currentEnd = end.get(mark);
+        currentNext = end.getReference().next.get(mark2);
 	  	if(currentEnd == end.getReference()) {
 	  		if(currentNext == null) {
-	  			end.getReference().next.compareAndSet(null,newNode);
+	  			end.getReference().next.compareAndSet(null,newNode,mark2[0],!mark2[0]);
+	  			break;
 	  		} else {
 	  			end.compareAndSet(currentEnd,currentNext,mark[0],!mark[0]);
 	  		}
@@ -37,6 +44,10 @@ then prev.next must be set to x. The check and update of prev.next can be done i
 instruction.*/
 
   public boolean remove(T value) {
+  	boolean[] mark = new boolean[1];
+  	AtomicMarkableReference<LLNode> previous = findNode(value);
+
+
 
     return false;
   }
@@ -47,13 +58,41 @@ can be retried. The second action requires a check that pred is not deleted, and
 the condition is true, then pred.next should be set to curr. The check and update can be done atomically
 in a CAS operation.*/
   public boolean contains(T value) {
+  	boolean[] mark = new boolean[1];
+  	if(findNode(value) != null) {
+  		return true;
+  	}
     return false;
+  }
+
+  public AtomicMarkableReference<LLNode> findNode(T value) {
+      LLNode current = list.getReference().next.getReference();
+      AtomicMarkableReference<LLNode> previous = list;
+      while((current != null)) {
+          if(current.value.equals(value)) {
+          	return previous;
+          }
+          previous = previous.getReference().next;
+          current = current.next.getReference();           
+      }
+      return null;
+  }
+
+  public String toString() {
+      StringBuilder sb = new StringBuilder();
+      LLNode current = list.getReference().next.getReference();
+      while((current != null)) {
+          sb.append("Val: " + current.value.toString() + "\n");
+          current = current.next.getReference();           
+      }
+      return sb.toString();
   }
 
   public class LLNode{
   	 T value;
-  	 AtomicReference<LLNode> next = new AtomicReference<LLNode>(null);
+  	 AtomicMarkableReference<LLNode> next = new AtomicMarkableReference<LLNode>(null,false);
   }
+
 }
 
 
