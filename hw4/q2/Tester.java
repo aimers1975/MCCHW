@@ -1,9 +1,9 @@
 public class Tester extends Thread{
 	int id;
-	LockFreeListSet<Integer> listing;
+	FineGrainedListSet<Integer> listing;
 	int range;
 
-	public Tester(int id, int range, LockFreeListSet<Integer> listing) {
+	public Tester(int id, int range, FineGrainedListSet<Integer> listing) {
         this.id = id;
         this.listing = listing;
         this.range = range;
@@ -17,11 +17,13 @@ public class Tester extends Thread{
 		}
 		if(listing.remove(new Integer(i-2))) {
 		    System.out.println("Removed: " + (i-2));	
+		} else {
+			System.out.println("Could not remove: " + (i-2));
 		}
 	}
 
 	public static void main(String[] args) {
-  	    LockFreeListSet<Integer> myList = new LockFreeListSet<Integer>();
+  	    FineGrainedListSet<Integer> myList = new FineGrainedListSet<Integer>();
 		for(int i=0; i<20; i=i+5) {
 			Tester thisThread = new Tester(i, i+5, myList);
 			thisThread.start();
