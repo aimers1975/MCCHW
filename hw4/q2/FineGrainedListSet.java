@@ -14,14 +14,24 @@ public class FineGrainedListSet<T> implements ListSet<T> {
   }
 
   public boolean add(T value) {
-  	LLNode newNode = new LLNode();
-    newNode.next = null;
-    newNode.value = value;
-  	end.lock();
-    end.next = newNode;
-    end = end.next;
-  	end.unlock();
-    return true;
+    if(!contains(value)) {
+      LLNode newNode = new LLNode();
+      newNode.next = null;
+      newNode.value = value;
+      LLNode tempEnd = end;
+      tempEnd.lock();
+      while(tempEnd.next != null) {
+        tempEnd.unlock();
+        end = end.next;
+        tempEnd = end;
+        tempEnd.lock();
+      }
+      tempEnd.next = newNode;
+      tempEnd.unlock();
+      end = end.next;
+      return true;
+    }
+    return false;
   }
   public boolean remove(T value) {
   	while(true) {

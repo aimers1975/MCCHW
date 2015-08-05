@@ -16,14 +16,17 @@ public class CoarseGrainedListSet<T> implements ListSet<T> {
   }
 
   public boolean add(T value) {
-    LLNode newNode = new LLNode();
-    newNode.next = null;
-    newNode.value = value;
-  	listLock.lock();
-    end.next = newNode;
-    end = end.next;
-  	listLock.unlock();
-    return true;
+    if(!contains(value)) {
+      LLNode newNode = new LLNode();
+      newNode.next = null;
+      newNode.value = value;
+      listLock.lock();
+      end.next = newNode;
+      end = end.next;
+      listLock.unlock();
+      return true;      
+    }
+    return false;
   }
   public boolean remove(T value) {
   	listLock.lock();
