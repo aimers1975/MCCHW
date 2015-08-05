@@ -11,23 +11,23 @@ public class Tester extends Thread {
 	}
 
 	public void run() {
-		if((this.id%3) == 1) {
+		if((this.id%2) == 1) {
 		//	System.out.println("TryingDequeued: ");
-		//	System.out.println("Finishing dequeue: " + queueing.deq().toString());			
+			System.out.println("Finishing dequeue: " + queueing.deq().toString());			
 		}
 
 		for(int i=id; i<range; i++) {
-		//	System.out.println("Enqueing: " + i);
+			System.out.println("Enqueing: " + i);
 			queueing.enq(new Integer(i));
 		}
-		//System.out.println("Dequeued: " + queueing.deq().toString());
+		System.out.println("Dequeued: " + queueing.deq().toString());
 
 	}
 
 	public static void main(String[] args) {
 		LockQueue<Integer> testqueue = new LockQueue<Integer>();
 		Long start = System.currentTimeMillis();
-		for(int i=0; i<2000; i=i+5) {
+		for(int i=0; i<100; i=i+5) {
 			Tester thisThread = new Tester(i, i+5, testqueue);
 			thisThread.start();
 		}
@@ -38,7 +38,7 @@ public class Tester extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//System.out.println("Final queue: \n"  + testqueue.toString());
+		System.out.println("Final queue: \n"  + testqueue.toString());
 
 	}
 }
