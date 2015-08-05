@@ -18,21 +18,23 @@ public class LockFreeListSet<T> implements ListSet<T> {
   	LLNode currentNext;
   	boolean[] mark;
   	boolean[] mark2;
-  	while(true) {
-	  	mark = new boolean[1];
-	  	mark2 = new boolean[1];
-	  	currentEnd = end.get(mark);
-        currentNext = end.getReference().next.get(mark2);
-	  	if(currentEnd == end.getReference()) {
-	  		if(currentNext == null) {
-	  			end.getReference().next.compareAndSet(null,newNode,mark2[0],!mark2[0]);
-	  			break;
-	  		} else {
-	  			end.compareAndSet(currentEnd,currentNext,mark[0],!mark[0]);
-	  		}
-	  	}
-	}
-	end.compareAndSet(currentEnd,newNode,mark[0],!mark[0]);
+    if(!contains(value)) {
+    	while(true) {
+  	  	mark = new boolean[1];
+  	  	mark2 = new boolean[1];
+  	  	currentEnd = end.get(mark);
+          currentNext = end.getReference().next.get(mark2);
+  	  	if(currentEnd == end.getReference()) {
+  	  		if(currentNext == null) {
+  	  			end.getReference().next.compareAndSet(null,newNode,mark2[0],!mark2[0]);
+  	  			break;
+  	  		} else {
+  	  			end.compareAndSet(currentEnd,currentNext,mark[0],!mark[0]);
+  	  		}
+  	  	}
+  	  }
+  	  end.compareAndSet(currentEnd,newNode,mark[0],!mark[0]);
+    } 
     return false;
   }
 
