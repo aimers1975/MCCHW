@@ -25,11 +25,11 @@ implementation, the deq operation should block if the queue is empty.
       if( value == null) throw new NullPointerException();
       enqLock.lock();
       try {
-          QNode e = new QNode();
-          e.value = value;
-          e.next = null;
-          tail.next = e;
-          tail = e;
+          QNode newNode = new QNode();
+          newNode.value = value;
+          newNode.next = null;
+          tail.next = newNode;
+          tail = newNode;
           count.getAndIncrement();
       } finally {
           enqLock.unlock();
