@@ -1,10 +1,10 @@
 public class Tester extends Thread {
 	
 	int id;
-	LockQueue<Integer> queueing;
+	LockFreeQueue<Integer> queueing;
 	int range;
 
-	public Tester(int id, int range, LockQueue<Integer> queueing) {
+	public Tester(int id, int range, LockFreeQueue<Integer> queueing) {
         this.id = id;
         this.queueing = queueing;
         this.range = range;
@@ -25,7 +25,7 @@ public class Tester extends Thread {
 	}
 
 	public static void main(String[] args) {
-		LockQueue<Integer> testqueue = new LockQueue<Integer>();
+		LockFreeQueue<Integer> testqueue = new LockFreeQueue<Integer>();
 		Long start = System.currentTimeMillis();
 		for(int i=0; i<100; i=i+5) {
 			Tester thisThread = new Tester(i, i+5, testqueue);
