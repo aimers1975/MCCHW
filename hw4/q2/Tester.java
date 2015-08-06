@@ -1,9 +1,9 @@
 public class Tester extends Thread{
 	int id;
-	CoarseGrainedListSet<Integer> listing;
+	LockFreeListSet<Integer> listing;
 	int range;
 
-	public Tester(int id, int range, CoarseGrainedListSet<Integer> listing) {
+	public Tester(int id, int range, LockFreeListSet<Integer> listing) {
         this.id = id;
         this.listing = listing;
         this.range = range;
@@ -16,9 +16,9 @@ public class Tester extends Thread{
 			listing.add(new Integer(i));
 		}
 		if(!listing.add(range-2)) {
-			System.out.println("Tried to add: " + (range-2) + " but failed correctly");
+			System.out.println("Tried to add: " + (range-1) + " but failed correctly");
 		} else {
-			System.out.println("Uh oh, didn't fail add...for " + (range-2));
+			System.out.println("Uh oh, didn't fail add...for " + (range-1));
 		}
 		if(listing.remove(new Integer(i-2))) {
 		    System.out.println("Removed: " + (i-2));	
@@ -28,9 +28,9 @@ public class Tester extends Thread{
 	}
 
 	public static void main(String[] args) {
-  	    CoarseGrainedListSet<Integer> myList = new CoarseGrainedListSet<Integer>();
-		for(int i=0; i<20; i=i+5) {
-			Tester thisThread = new Tester(i, i+5, myList);
+  	    LockFreeListSet<Integer> myList = new LockFreeListSet<Integer>();
+		for(int i=0; i<20; i=i+2) {
+			Tester thisThread = new Tester(i, i+2, myList);
 			thisThread.start();
 		}
 		try {

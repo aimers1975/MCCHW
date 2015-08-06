@@ -18,6 +18,7 @@ public class LockFreeListSet<T> implements ListSet<T> {
   	LLNode currentNext;
   	boolean[] mark;
   	boolean[] mark2;
+    boolean success = false;
     if(!contains(value)) {
     	while(true) {
   	  	mark = new boolean[1];
@@ -27,6 +28,7 @@ public class LockFreeListSet<T> implements ListSet<T> {
   	  	if(currentEnd == end.getReference()) {
   	  		if(currentNext == null) {
   	  			end.getReference().next.compareAndSet(null,newNode,mark2[0],!mark2[0]);
+            success = true;
   	  			break;
   	  		} else {
   	  			end.compareAndSet(currentEnd,currentNext,mark[0],!mark[0]);
@@ -35,7 +37,7 @@ public class LockFreeListSet<T> implements ListSet<T> {
   	  }
   	  end.compareAndSet(currentEnd,newNode,mark[0],!mark[0]);
     } 
-    return false;
+    return success;
   }
 
 
@@ -44,7 +46,6 @@ public class LockFreeListSet<T> implements ListSet<T> {
   	AtomicMarkableReference<LLNode> previous;
   	AtomicMarkableReference<LLNode> delete;
   	LLNode deleteNode;
-  	System.out.println("Calling remove");
   	while(true) {
   		previous = findNode(value);
   		if(previous != null) {
@@ -52,21 +53,21 @@ public class LockFreeListSet<T> implements ListSet<T> {
 	  			delete = previous.getReference().next;
 	  			deleteNode = previous.getReference().next.get(mark);
 	  			//Set delete mark on previous.next to true
-	  			System.out.println("Trying to set delete mark to true on value: " + ((Integer)value).toString());
+	  			//System.out.println("Trying to set delete mark to true on value: " + ((Integer)value).toString());
 	  			if(delete.attemptMark(deleteNode,!mark[0])) {
-	  				System.out.println("Attempt mark was true for node: " + ((Integer)value).toString());
+	  				//System.out.println("Attempt mark was true for node: " + ((Integer)value).toString());
 	  				break;
 	  			} else {
-	  				System.out.println("Attempt mark was false for node: " +((Integer)value).toString());
+	  				//System.out.println("Attempt mark was false for node: " +((Integer)value).toString());
 	  			}
 	  		}
 	  	}
   	}
   	boolean[] mark2 = new boolean[1];
   	if(previous.getReference().next.compareAndSet(deleteNode,delete.getReference().next.getReference(),mark2[0],!mark2[0])) {
-	    System.out.println("Successfully moved previous to point to next node for deleted node: " + value.toString());
+	    //System.out.println("Successfully moved previous to point to next node for deleted node: " + value.toString());
 	} else {
-		System.out.println("Failed to move previous to skip this node: " + value.toString());
+		//System.out.println("Failed to move previous to skip this node: " + value.toString());
 	}
   	return true;
   }
@@ -77,7 +78,7 @@ can be retried. The second action requires a check that pred is not deleted, and
 the condition is true, then pred.next should be set to curr. The check and update can be done atomically
 in a CAS operation.*/
   public boolean contains(T value) {
-  	System.out.println("Calling contains");
+  	//System.out.println("Calling contains");
   	boolean[] mark = new boolean[1];
   	if(findNode(value) != null) {
   		return true;
@@ -86,7 +87,7 @@ in a CAS operation.*/
   }
 
   public AtomicMarkableReference<LLNode> findNode(T value) {
-  	  System.out.println("Calling find node on: " + value.toString());
+  	  //System.out.println("Calling find node on: " + value.toString());
       LLNode current = list.getReference().next.getReference();
       AtomicMarkableReference<LLNode> previous = list;
       while((current != null)) {
